@@ -212,18 +212,16 @@ const locations = [
 ------------------------------------------------------------------------
 `),
 ];
-let unvisited_locations = locations;
 let last_location_name;
 
 
 window.onload = () => {
-  // load the game
   try {
     let savegame = JSON.parse(localStorage.getItem("save"));
 
     if (savegame == null) {
       // so localStorage.getItem("save") is not undefined, but it is null
-      alert("Welcome to The Ultimate Run");
+      alert("Welcome to The Ultra Ultra Ultra Marathon (200,000km edition)");
     } else {
       if (typeof savegame.upgrades !== "undefined") {
         num_shoes = parseInt(savegame.upgrades.num_shoes);
@@ -248,23 +246,13 @@ window.onload = () => {
         distance = parseInt(savegame.current_state.distance);
         per_click = parseInt(savegame.current_state.per_click);
         super_fruit_counter = parseInt(savegame.current_state.super_fruit_counter);
-
-        unvisited_locations = [];
-        let after_visited = false;
-        for(let i = 0; i < locations.length; i++) {
-          if (savegame.current_state.last_location_name === locations[i].name) {
-            after_visited = true;
-          }
-          if (after_visited) {
-            unvisited_locations.push(locations[i]);
-          }
-        }
       }
     }
-    // solution to glitchiness
 
+    // set initial values displayed to the user
     set_health();
     update_html();
+    update_buttons();
     determine_location();
   } catch(error) {
     console.error(error);
@@ -285,7 +273,7 @@ function deactivate_button(button) {
 function run(number) {
   if (health_level > 0) {
     distance = distance + number;
-    document.getElementById("distance").innerHTML = distance;
+    document.getElementById("distance").innerHTML = number_format(distance);
   }
 };
 
@@ -306,16 +294,13 @@ document.getElementById("map_button").addEventListener('click', () => {
   }
 });
 
-document.getElementById("sleepAction").addEventListener('click', () => {
-  health_level = 50;
-});
-
 document.getElementById("eatNutBarAction").addEventListener('click', () => {
   if (health_level != 0) {
     health_level += (num_bars*5 + health_level > 50 ? 50 - health_level : num_bars*5);
     num_bars = 0;
   }
 });
+
 
 // MAKE HELPER FUNCTION FILE YO LOLZ DUMB
 export function addParagraphToDialog(text) {
@@ -371,7 +356,7 @@ document.getElementById("buyDog").addEventListener ('click', () => {
     num_dog = num_dog + 1;
     inventory = inventory + 1;
     distance = distance - price_dog;
-    price_dog = Math.floor(base_dog_price*Math.pow(1.1, num_dog));
+    price_dog = Math.floor(base_dog_price*Math.pow(1.15, num_dog));
     addParagraphToDialog("Dogs are truly man's best friend. Your dog's mileage also counts towards your total distance covered");
   }
 });
@@ -382,146 +367,33 @@ document.getElementById("buySuperDog").addEventListener ('click', () => {
     num_super_dog = num_super_dog + 1;
     inventory = inventory + 1;
     distance = distance - price_super_dog;
-    price_super_dog = Math.floor(base_super_dog_price*Math.pow(1.1, num_super_dog));
+    price_super_dog = Math.floor(base_super_dog_price*Math.pow(1.15, num_super_dog));
     addParagraphToDialog("This dog runs like a pro, helping you rake in those miles like no other");
   }
 });
 
+function number_format(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function update_html() {
-  document.getElementById('distance').innerHTML = distance;
+  document.getElementById('distance').innerHTML = number_format(distance);
   document.getElementById('per_click').innerHTML = per_click;
   document.getElementById('num_shoes').innerHTML = num_shoes;
-  document.getElementById('price_shoes').innerHTML = price_shoes;
+  document.getElementById('price_shoes').innerHTML = number_format(price_shoes);
   document.getElementById('num_robo').innerHTML = num_robo;
-  document.getElementById('price_robo').innerHTML = price_robo;
+  document.getElementById('price_robo').innerHTML = number_format(price_robo);
   document.getElementById('num_octo').innerHTML = num_octo;
-  document.getElementById('price_octo').innerHTML = price_octo;
+  document.getElementById('price_octo').innerHTML = number_format(price_octo);
   document.getElementById('num_dog').innerHTML = num_dog;
-  document.getElementById('price_dog').innerHTML = price_dog;
+  document.getElementById('price_dog').innerHTML = number_format(price_dog);
   document.getElementById('num_super_dog').innerHTML = num_super_dog;
-  document.getElementById('price_super_dog').innerHTML = price_super_dog;
+  document.getElementById('price_super_dog').innerHTML = number_format(price_super_dog);
   document.getElementById('num_bars').innerHTML = num_bars;
   document.getElementById('num_fruit').innerHTML = num_fruit;
 }
 
-window.setInterval(
-  update_html, 100);
-
-// motivational messages
-window.setInterval(function() {
-  let random = Math.random();
-  if (random < 0.25) {
-    addParagraphToDialog("Keep on going!");
-  } else if(random < 0.5) {
-    addParagraphToDialog("Push through the pain!");
-  } else if(random < 0.75) {
-    addParagraphToDialog("One foot in front of the other!");
-  } else {
-    addParagraphToDialog("Keep on running!");
-  }
-
-}, 10000);
-
-function decline_health() {
-  health_level--;
-  let html = '['
-  for (let i = 0; i < health_level; i++) {
-    html += '#'
-  }
-  for (let i = 0; i < 50 - health_level; i++) {
-    html += '-'
-  }
-  html += `] ${Math.floor(health_level/50*100)}% health-level`
-document.getElementById('health-bar').innerHTML = html;
-document.getElementById('night').style.opacity = 0.8 - health_level/50
-}
-
-// call this for onload
-function set_health() {
-  let html = '['
-  for (let i = 0; i < health_level; i++) {
-    html += '#'
-  }
-  for (let i = 0; i < 50 - health_level; i++) {
-    html += '-'
-  }
-  html += `] ${Math.floor(health_level/50*100)}% health-level`
-document.getElementById('health-bar').innerHTML = html;
-document.getElementById('night').style.opacity = 0.8 - health_level/50
-}
-
-
-//when you eat a superfruit, you 1. deactivate health_decline
-// but you only deactivate it if it hasn't been 10 minutes yet
-// (you need to save this thing).
-// each minute, you decrease, but if it is at a level below zero, then
-// just don't decrease
-
-document.getElementById('eatSuperFruit').addEventListener('click', () => {
-  if (num_fruit > 0) {
-    num_fruit--;
-    super_fruit_counter = 10;
-    let fruit_timer = window.setInterval(() => {
-      if (super_fruit_counter > 0) {
-        super_fruit_counter--;
-      } else {
-        clearInterval(fruit_timer);
-      }
-    }, 60000); // every minute for ten increments
-  }
-});
-
-// health bar decline
-window.setInterval(function() {
-  if (health_level > 0 && super_fruit_counter === 0) {
-    health_level--;
-    set_health();
-  } else if (document.getElementById('sleep').childNodes.length > 4 && super_fruit_counter === 0) {
-    activate_button('sleepAction');
-    activate_button('eatNutBarAction');
-    activate_button('eatSuperFruit');
-    health_level = 50;
-    set_health();
-    addParagraphToDialog("Don't push yourself too hard! Watch your health bar, if it gets to 0%, you will automatically sleep for 5 seconds. Alternatively, fuel yourself with nut bars and sleep!");
-    let sleep_div = document.getElementById('sleep')
-    while (sleep_div.firstChild) {
-      sleep_div.removeChild(sleep_div.firstChild);
-    }
-  } else if (super_fruit_counter === 0) {
-    deactivate_button('sleepAction');
-    deactivate_button('eatNutBarAction');
-    deactivate_button('eatSuperFruit');
-    const newParagraph = document.createElement("P");
-    newParagraph.style.color = 'white';
-    const newContent = document.createTextNode("zzZZZzzZZZzzz");
-    newParagraph.appendChild(newContent);
-    document.getElementById("sleep").appendChild(newParagraph);
-  }
-}, health_decline_rate);
-
-function determine_location() {
-  for(let i = 0; i < unvisited_locations.length; i++) {
-    if (unvisited_locations[i].at_distance <= distance) {
-      unvisited_locations[i].set_location();
-      let last_location = unvisited_locations.shift();
-      last_location_name = last_location.name
-    }
-  }
-}
-//... maybe separate these into their separate functions so that
-//we can see the progress and it's not just jumpy every minute
-window.setInterval(function() {
-  run(num_robo);
-  run(num_robo*5);
-  run(num_octo*10);
-  run(num_dog*13);
-  run(num_super_dog*40);
-
-  if (distance % 3 == 0 && distance != 0) {
-    num_bars += 1;
-    addParagraphToDialog('You found a nut bar');
-  }
-
+function update_buttons() {
   // update button states
   if (distance >= price_shoes && health_level > 0) {
     activate_button('buyShoes');
@@ -529,13 +401,13 @@ window.setInterval(function() {
     deactivate_button('buyShoes');
   }
 
-  if (num_fruit > 0) {
+  if (num_fruit > 0 && health_level > 0) {
     activate_button('eatSuperFruit');
   } else {
     deactivate_button('eatSuperFruit');
   }
 
-  if (num_bars > 0 && health_level != 0) {
+  if (num_bars > 0 && health_level > 0) {
     activate_button('eatNutBarAction');
   } else {
     deactivate_button('eatNutBarAction');
@@ -570,10 +442,150 @@ window.setInterval(function() {
   } else {
     deactivate_button('buyShoes');
   }
-  // put this is another setInterval...
-  // also this is a bit glitchy!
-  // save the state of the game
-  // also run this save only at a certain interval
+}
+
+// high frequency updating everything that is on the page
+window.setInterval(() => {
+  update_html();
+  update_buttons();
+  determine_location();
+} , 100);
+
+// selfie - looping for animations
+(function loop() {
+  let running_man = document.getElementById('running-man')
+  if (health_level <= 0) {
+    running_man.style.color = 'white';
+    running_man.innerHTML = `
+
+z
+ z  ||  /
+  O----/--   
+    
+             `
+  } else if (running_man.innerHTML.match(/_O/) !== null) {
+    running_man.innerHTML = `
+      \\O_  
+   ,/\\/
+     /
+     \\
+     \`
+             `
+  } else {
+    running_man.style.color = 'black';
+    running_man.innerHTML =
+    `
+   _O/
+     \\
+     /\\_
+     \\  \`
+     \`
+             `
+  }
+  window.setTimeout(loop, 1200-800*(health_level/50));
+})();
+
+// motivational messages
+window.setInterval(function() {
+  let random = Math.random();
+  if (random < 0.25) {
+    addParagraphToDialog("Keep on going!");
+  } else if(random < 0.5) {
+    addParagraphToDialog("Push through the pain!");
+  } else if(random < 0.75) {
+    addParagraphToDialog("One foot in front of the other!");
+  } else {
+    addParagraphToDialog("Keep on running!");
+  }
+
+}, 10000);
+
+// call this for onload
+function set_health() {
+  let html = '['
+  for (let i = 0; i < health_level; i++) {
+    html += '#'
+  }
+  for (let i = 0; i < 50 - health_level; i++) {
+    html += '-'
+  }
+  html += `] ${Math.floor(health_level/50*100)}% health-level`
+document.getElementById('health-bar').innerHTML = html;
+document.getElementById('night').style.opacity = 0.8 - health_level/50
+}
+
+document.getElementById('eatSuperFruit').addEventListener('click', () => {
+  if (num_fruit > 0) {
+    num_fruit--;
+    super_fruit_counter = 10;
+    let fruit_timer = window.setInterval(() => {
+      if (super_fruit_counter > 0) {
+        super_fruit_counter--;
+      } else {
+        clearInterval(fruit_timer);
+      }
+    }, 60000); // every minute for ten increments
+  }
+});
+
+// health bar decline
+window.setInterval(function() {
+  if (health_level > 0 && super_fruit_counter === 0) {
+    health_level--;
+    set_health();
+  } else if (document.getElementById('sleep').childNodes.length > 4 && super_fruit_counter === 0) {
+    health_level = 50;
+    set_health();
+    addParagraphToDialog("Don't push yourself too hard! Watch your health bar, if it gets to 0%, you will automatically sleep for 5 seconds. Alternatively, fuel yourself with nut bars and sleep!");
+    let sleep_div = document.getElementById('sleep')
+    while (sleep_div.firstChild) {
+      sleep_div.removeChild(sleep_div.firstChild);
+    }
+  } else if (super_fruit_counter === 0) {
+    const newParagraph = document.createElement("P");
+    newParagraph.style.color = 'white';
+    const newContent = document.createTextNode("zzZZZzzZZZzzz");
+    newParagraph.appendChild(newContent);
+    document.getElementById("sleep").appendChild(newParagraph);
+  }
+}, health_decline_rate);
+
+function determine_location() {
+  for(let i = locations.length - 1; i >= 0; i--) {
+    if (locations[i].at_distance <= distance) {
+      locations[i].set_location();
+      break;
+    }
+  }
+}
+
+window.setInterval(function() {
+  // calculating the interval
+  let num_upgrades = 0;
+  let upgrades_array = [num_robo, num_octo, num_dog, num_super_dog]
+  for (let i = 0; i < upgrades_array.length; i++) {
+    if (upgrades_array[i] > 0) {
+      num_upgrades++;
+    }
+  }
+  // there is a slight delay...
+  setTimeout(() => {run(num_robo*5)}, 1000/num_upgrades);
+  setTimeout(() => {run(num_octo*15)}, 2*1000/num_upgrades);
+  setTimeout(() => {run(num_dog*25)}, 3*1000/num_upgrades);
+  setTimeout(() => {run(num_super_dog*50)}, 4*1000/num_upgrades);
+
+  if (distance >= 200000) {
+    alert("You've ran 20,000km and beat the game! The game is automatically restarted");
+    restart();
+  }
+
+  if (distance % 21 == 0 && distance != 0) {
+    num_bars += 1;
+    addParagraphToDialog('You found a nut bar');
+  }
+
+
+  // not every second...
   let save = {
     upgrades: {
       num_shoes: num_shoes,
@@ -608,12 +620,10 @@ window.setInterval(function() {
     console.error(error); // this just formats error loggin
   }
 
-  determine_location();
 
 }, 1000);
 
-// when you use export, it will enable this function to live at the globale function
-export function restart_cheat() {
+function restart() {
   distance = 0;
   per_click = 1;
   num_shoes = 0;
@@ -634,11 +644,16 @@ export function restart_cheat() {
   num_fruit = 0;
   let dialog = document.getElementById('dialog')
 
-  unvisited_locations = locations;
   while (dialog.firstChild) {
     dialog.removeChild(dialog.firstChild);
   }
   console.log("restart successful!");
+}
+
+
+// when you use export, it will enable this function to live at the globale function
+export function restart_cheat() {
+  restart();
 }
 
 // DO NOT JUMP BETWEEN LOCATION CHEATS
@@ -667,3 +682,15 @@ export function ocean_cheat() {
 export function niger_cheat() {
   distance = 100000;
 }
+
+export function fruit_cheat() {
+  num_fruit++;
+}
+
+export function end_cheat() {
+  distance = 199999;
+}
+
+
+//TODO: deactivate your nut bars button (and superfruit button) when you're in superfruit mode
+//TODO: save on not every frame

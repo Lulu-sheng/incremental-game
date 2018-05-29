@@ -282,15 +282,18 @@ class Location {
   }
 
   set_location() {
-    document.getElementById('loc_name').innerHTML = this.name;
-    document.getElementById('map').innerHTML = this.map;
-    document.body.style.backgroundColor = this.color;
-    addParagraphToDialog(this.intro_message);
-    if (this.has_superfruit) {
-      addParagraphToDialog('You picked up a superfruit... use it wisely');
-      add_fruit();
+    // only on the initial load
+    if (document.getElementById('loc_name').innerHTML != this.name) {
+      document.getElementById('loc_name').innerHTML = this.name;
+      document.getElementById('map').innerHTML = this.map;
+      document.body.style.backgroundColor = this.color;
+      addParagraphToDialog(this.intro_message);
+      if (this.has_superfruit && Math.random() > 0.5) {
+        addParagraphToDialog('You picked up a superfruit... use it wisely');
+        add_fruit();
+      }
+      document.getElementById('road').innerHTML = this.path;
     }
-    document.getElementById('road').innerHTML = this.path;
   }
 }
 

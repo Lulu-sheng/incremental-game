@@ -3,28 +3,3 @@ button.disabled {
   filter: alpha(opacity=65);
   opacity: .65;
 } 
-
-* {
-  font-family: Courier
-}
-
-.path {
-  color: red;
-}
-
-pre#road {
-  margin: 0px !important;
-}
-
-button {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
