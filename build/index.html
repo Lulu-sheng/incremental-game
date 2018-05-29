@@ -3,10 +3,70 @@
   <head>
     <meta charset="utf-8">
     <title>App</title>
+    <link rel="stylesheet" type="text/html" href="css/main.css">
   </head>
   <body>
-    <!-- add the following div only in the react section -->
-    <div id="root"></div>
-    <script src="bundle.js" charset="utf-8"></script>
+    <div id="night" style="background-color: black; opacity: 0.0; position: fixed; height: 100%; width: 100%; top: 0; left: 0; z-index: -1;">
+    </div>
+    <div style="display: flex;">
+      <div id="sidebar">
+        <div id="inventory">
+          <strong>Inventory</strong>
+          <p style="white-space:nowrap">Better Shoes: <span id="num_shoes"></span></p>
+          <p style="white-space:nowrap">Robotic Legs: <span id="num_robo"></span></p>
+          <p style="white-space:nowrap">Octopus Legs: <span id="num_octo"></span></p>
+          <p style="white-space:nowrap">Dogs: <span id="num_dog"></span></p>
+          <p style="white-space:nowrap">Super Dogs: <span id="num_super_dog"></span></p>
+          <p style="white-space:nowrap">Nut Bars: <span id="num_bars"></span></p>
+          <p style="white-space:nowrap">Super Fruit: <span id="num_fruit"></span></p>
+
+          <pre>
+---------------------
+<button id="map_button">SHOW MAP</button>
+---------------------</pre>
+        </div>
+        <div id="dialog-box">
+          <strong>Personal Trainer</strong>
+          <div id="dialog" style="height: 475px; width: 170px; overflow-y: scroll">
+          </div>
+        </div>
+      </div>
+      <pre id ="road">
+      </pre>
+
+      <div id="main_content">
+        <pre id="health-bar">
+        </pre>
+        <div id="purchase_buttons">
+          <button id="clickButton">Run: (<span id="per_click"></span>)</button>
+          <p>Distance: <span id="distance"></span> km</p>
+          <button id="buyShoes">Buy Better Shoes (<span id="price_shoes"></span>)</button>
+          <button id="buyRobo">Buy Robotic Legs (<span id="price_robo"></span>)</button>
+          <button id="buyOcto">Buy Octopus Legs (<span id="price_octo"></span>)</button>
+          <button id="buyDog">Buy Dog (<span id="price_dog"></span>)</button>
+          <button id="buySuperDog">Buy Super Dog (<span id="price_super_dog"></span>)</button>
+        </div>
+
+        <div id="health_buttons" style="margin-top: 1rem;">
+          <button id="sleepAction">Sleep</button>
+          <button id="eatNutBarAction">Eat All Your Nutbars</button>
+          <button id="eatSuperFruit">Eat Super Fruit</button>
+        </div>
+
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <pre id="map" style="display: none;">
+        </pre>
+        <p id="map_caption" style="display: none;">Current Location: <span id="loc_name"></span></p>
+
+      </div>
+      <div id="sleep"> 
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+      <script src="bundle.js" charset="utf-8"></script>
   </body>
 </html>
