@@ -1,3 +1,5 @@
+# Learning Javascript ES6 by Building an Incremental Game
+
 # Essentials in JavaScript ES6 - A Fun and Clear Introduction
 
 ### Please use this resource for the following reasons!
@@ -14,3 +16,5 @@ Enjoy the course, and keep coding!
 ***
 
 Link to original course: https://www.udemy.com/essentials-in-javascript-es6
+
+
