@@ -1,5 +1,4 @@
-// https://stackoverflow.com/questions/15005098/why-does-javascript-hoist-variables?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-import {locations} from './variables';
+import {locations} from './locations-array';
 
 // keep track of variables
 const baseShoePrice = 20;
@@ -37,11 +36,10 @@ function deactivateButton(button) {
 }
 
 function run(number) {
-  if (healthLevel > 0) {
-    distance = distance + number;
-    document.getElementById('distance').innerHTML = numberFormat(distance);
-  }
-};
+  if (healthLevel <= 0) { return; }
+  distance += number;
+  document.getElementById('distance').innerHTML = numberFormat(distance);
+}
 
 function restart() {
   distance = 0;
@@ -62,16 +60,15 @@ function restart() {
   numBars = 0;
   superFruitCounter = 0;
   numFruit = 0;
-  let dialog = document.getElementById('dialog');
+  const dialog = document.getElementById('dialog');
 
   while (dialog.firstChild) {
     dialog.removeChild(dialog.firstChild);
   }
-  console.log('restart successful!');
 }
 
 function determineLocation() {
-  for(let i = locations.length - 1; i >= 0; i--) {
+  for (let i = locations.length - 1; i >= 0; i--) {
     if (locations[i].atDistance <= distance) {
       locations[i].setLocation();
       break;
@@ -87,9 +84,9 @@ function setHealth() {
   for (let i = 0; i < 50 - healthLevel; i++) {
     html += '-';
   }
-  html += `] ${Math.floor(healthLevel/50*100)} % health-level`;
-document.getElementById('health-bar').innerHTML = html;
-document.getElementById('night').style.opacity = 0.8 - healthLevel/50;
+  html += `] ${Math.floor(healthLevel / 50 * 100)}% health-level`;
+  document.getElementById('health-bar').innerHTML = html;
+  document.getElementById('night').style.opacity = 0.8 - (healthLevel / 50);
 }
 
 function updateHtml() {
@@ -168,7 +165,7 @@ export function addParagraphToDialog(text) {
   const newParagraph = document.createElement('P');
   const newContent = document.createTextNode(text);
   newParagraph.appendChild(newContent);
-  let dialog = document.getElementById('dialog');
+  const dialog = document.getElementById('dialog');
   dialog.insertBefore(newParagraph, dialog.childNodes[0]);
 }
 
@@ -179,52 +176,52 @@ export function addFruit() {
 // load everything
 window.onload = () => {
   try {
-    let savegame = JSON.parse(localStorage.getItem('save'));
+    const savegame = JSON.parse(localStorage.getItem('save'));
     if (savegame == null) {
       alert('Welcome to The Ultra Ultra Ultra Marathon (200,000km edition)');
     } else {
       if (typeof savegame.upgrades !== 'undefined') {
-        numShoes = parseInt(savegame.upgrades.numShoes);
-        numRobo = parseInt(savegame.upgrades.numRobo);
-        numOcto = parseInt(savegame.upgrades.numOcto);
-        numDog = parseInt(savegame.upgrades.numDog);
-        numSuperDog = parseInt(savegame.upgrades.numSuperDog);
-        priceShoes = parseInt(savegame.upgrades.priceShoes);
-        priceRobo = parseInt(savegame.upgrades.priceRobo);
-        priceOcto = parseInt(savegame.upgrades.priceOcto);
-        priceDog = parseInt(savegame.upgrades.priceDog);
-        priceSuperDog = parseInt(savegame.upgrades.priceSuperDog);
-        inventory = parseInt(savegame.upgrades.inventory);
+        numShoes = parseInt(savegame.upgrades.numShoes, 10);
+        numRobo = parseInt(savegame.upgrades.numRobo, 10);
+        numOcto = parseInt(savegame.upgrades.numOcto, 10);
+        numDog = parseInt(savegame.upgrades.numDog, 10);
+        numSuperDog = parseInt(savegame.upgrades.numSuperDog, 10);
+        priceShoes = parseInt(savegame.upgrades.priceShoes, 10);
+        priceRobo = parseInt(savegame.upgrades.priceRobo, 10);
+        priceOcto = parseInt(savegame.upgrades.priceOcto, 10);
+        priceDog = parseInt(savegame.upgrades.priceDog, 10);
+        priceSuperDog = parseInt(savegame.upgrades.priceSuperDog, 10);
+        inventory = parseInt(savegame.upgrades.inventory, 10);
       }
       if (typeof savegame.health !== 'undefined') {
-        healthLevel = parseInt(savegame.health.healthLevel);
-        healthDeclineRate = parseInt(savegame.health.healthDeclineRate);
-        numBars = parseInt(savegame.health.numBars);
-        numFruit = parseInt(savegame.health.numFruit);
+        healthLevel = parseInt(savegame.health.healthLevel, 10);
+        healthDeclineRate = parseInt(savegame.health.healthDeclineRate, 10);
+        numBars = parseInt(savegame.health.numBars, 10);
+        numFruit = parseInt(savegame.health.numFruit, 10);
       }
       if (typeof savegame.currentState !== 'undefined') {
-        distance = parseInt(savegame.currentState.distance);
-        perClick = parseInt(savegame.currentState.perClick);
-        superFruitCounter = parseInt(savegame.currentState.superFruitCounter);
+        distance = parseInt(savegame.currentState.distance, 10);
+        perClick = parseInt(savegame.currentState.perClick, 10);
+        superFruitCounter = parseInt(savegame.currentState.superFruitCounter, 10);
       }
     }
-    // after loading the data from the localStorage, 
+    // after loading the data from the localStorage,
     // reset the elements of the display
     setHealth();
     updateHtml();
     updateButtons();
     determineLocation();
-  } catch(error) {
+  } catch (error) {
     console.error(error);
   }
-}
+};
 
 document.getElementById('clickButton').addEventListener ('click', () => {
   run(perClick);
 });
 
 document.getElementById('map_button').addEventListener('click', () => {
-  let button = document.getElementById('map_button');
+  const button = document.getElementById('map_button');
   if (button.innerHTML === 'HIDE MAP') {
     button.innerHTML = 'SHOW MAP';
     document.getElementById('map').style.display = 'none';
@@ -237,86 +234,79 @@ document.getElementById('map_button').addEventListener('click', () => {
 });
 
 document.getElementById('eatNutBarAction').addEventListener('click', () => {
-  if (healthLevel != 0) {
-    healthLevel += (numBars * 5 + healthLevel > 50 ? 50 - healthLevel : numBars * 5);
-    numBars = 0;
-  }
+  if (healthLevel === 0) { return; }
+  healthLevel += ((numBars * 5) + healthLevel > 50 ? 50 - healthLevel : numBars * 5);
+  numBars = 0;
 });
 
 document.getElementById('eatSuperFruit').addEventListener('click', () => {
-  if (numFruit > 0) {
-    numFruit--;
-    superFruitCounter = 10;
-    let fruitTimer = window.setInterval(() => {
-      if (superFruitCounter > 0) {
-        superFruitCounter--;
-      } else {
-        clearInterval(fruitTimer);
-      }
-    }, 60000);
-  }
+  if (numFruit <= 0) { return; }
+  numFruit--;
+  superFruitCounter = 10;
+  const fruitTimer = window.setInterval(() => {
+    if (superFruitCounter > 0) {
+      superFruitCounter--;
+    } else {
+      clearInterval(fruitTimer);
+    }
+  }, 60000);
 });
 
 // event handler for buying shoes
 document.getElementById('buyShoes').addEventListener ('click', () => {
-  if (distance >= priceShoes) {
-    numShoes = numShoes + 1;
-    inventory = inventory + 1;
-    distance = distance - priceShoes;
-    perClick = perClick + 1;
-    priceShoes = Math.floor(baseShoePrice * Math.pow(1.1, numShoes));
-    addParagraphToDialog('Awesome! Harnessed with your new kicks, ' +
-      'you get to run a tad bit faster.');
-  }
+  if (distance < priceShoes) { return; }
+  numShoes++;
+  inventory++;
+  distance -= priceShoes;
+  perClick++;
+  priceShoes = Math.floor(baseShoePrice * Math.pow(1.1, numShoes));
+  addParagraphToDialog('Awesome! Harnessed with your new kicks, ' +
+    'you get to run a tad bit faster.');
 });
 
 // event handler for buying robotic legs
 document.getElementById('buyRobo').addEventListener ('click', () => {
-  if (distance >= priceRobo) {
-    numRobo = numRobo + 1;
-    inventory = inventory + 1;
-    distance = distance - priceRobo;
-    priceRobo = Math.floor(baseRoboPrice * Math.pow(1.1, numRobo));
-    addParagraphToDialog('Swagilicious legs my friend! ' +
-      'Now you can let your new legs do the work for you. ' + 
-      'Automatic running!');
-  }
+  if (distance < priceRobo) { return; }
+  numRobo++;
+  inventory++;
+  distance -= priceRobo;
+  priceRobo = Math.floor(baseRoboPrice * Math.pow(1.1, numRobo));
+  addParagraphToDialog('Swagilicious legs my friend! ' +
+    'Now you can let your new legs do the work for you. ' +
+    'Automatic running!');
 });
 
 // event handler for buying octopus legs
 document.getElementById('buyOcto').addEventListener ('click', () => {
-  if (distance >= priceOcto) {
-    numOcto = numOcto + 1;
-    inventory = inventory + 1;
-    distance = distance - priceOcto;
-    priceOcto = Math.floor(baseOctoPrice * Math.pow(1.1, numOcto));
-    addParagraphToDialog('Cheetah what? New studies show that octopi ' +
-      'are the fastest creatures to ever live, and you got their legs!');
-  }
+  if (distance < priceOcto) { return; }
+  numOcto++;
+  inventory++;
+  distance -= priceOcto;
+  priceOcto = Math.floor(baseOctoPrice * Math.pow(1.1, numOcto));
+  addParagraphToDialog('Cheetah what? New studies show that octopi ' +
+    'are the fastest creatures to ever live, and you got their legs!');
 });
 
 // event handler for buying dog
 document.getElementById('buyDog').addEventListener ('click', () => {
-  if (distance >= priceDog) {
-    numDog = numDog + 1;
-    inventory = inventory + 1;
-    distance = distance - priceDog;
-    priceDog = Math.floor(baseDogPrice * Math.pow(1.15, numDog));
-    addParagraphToDialog("Dogs are truly man's best friend. Your dog's " + 
-      'mileage also counts towards your total distance covered');
-  }
+  if (distance < priceDog) { return; }
+  numDog++;
+  inventory++;
+  distance -= priceDog;
+  priceDog = Math.floor(baseDogPrice * Math.pow(1.15, numDog));
+  addParagraphToDialog("Dogs are truly man's best friend. Your dog's " +
+    'mileage also counts towards your total distance covered');
 });
 
 // event handler for buying super dog
 document.getElementById('buySuperDog').addEventListener ('click', () => {
-  if (distance >= priceSuperDog) {
-    numSuperDog = numSuperDog + 1;
-    inventory = inventory + 1;
-    distance = distance - priceSuperDog;
-    priceSuperDog = Math.floor(baseSuperDogPrice * Math.pow(1.15, numSuperDog));
-    addParagraphToDialog('This dog runs like a pro, helping you ' +
-      'rake in those miles like no other');
-  }
+  if (distance < priceSuperDog) { return; }
+  numSuperDog++;
+  inventory++;
+  distance -= priceSuperDog;
+  priceSuperDog = Math.floor(baseSuperDogPrice * Math.pow(1.15, numSuperDog));
+  addParagraphToDialog('This dog runs like a pro, helping you ' +
+    'rake in those miles like no other');
 });
 
 // check and update the display frequently
@@ -324,45 +314,46 @@ window.setInterval(() => {
   updateHtml();
   updateButtons();
   determineLocation();
-} , 100);
+}, 100);
 
 // loop function call for animating the running man
 (function loop() {
-  let runningMan = document.getElementById('running-man');
+  const runningMan = document.getElementById('running-man');
   if (healthLevel <= 0) {
     runningMan.style.color = 'white';
     runningMan.innerHTML = `
 
-z
- z  ||  /
-  O----/--   
-    
-             `
-  } else if (runningMan.innerHTML.match(/_O/) !== null) {
+    z
+     z  ||  /
+      O----/--   
+
+    `;
+  } else if (runningMan.innerHTML.match(/_O/) === null) {
+    runningMan.style.color = 'black';
+    runningMan.innerHTML =
+      `
+    _O/
+      \\
+      /\\_
+      \\  \`
+      \`
+    `;
+  } else {
+    runningMan.style.color = 'black';
     runningMan.innerHTML = `
       \\O_  
    ,/\\/
      /
      \\
      \`
-             `
-  } else {
-    runningMan.style.color = 'black';
-    runningMan.innerHTML =
-    `
-   _O/
-     \\
-     /\\_
-     \\  \`
-     \`
-             `
+    `;
   }
-  window.setTimeout(loop, 1200-800 * (healthLevel / 50));
+  window.setTimeout(loop, 1200 - (800 * (healthLevel / 50)));
 })();
 
 // Display random motivational messages
-window.setInterval(function() {
-  let random = Math.random();
+window.setInterval(() => {
+  const random = Math.random();
   if (random < 0.25) {
     addParagraphToDialog('Keep on going!');
   } else if (random < 0.5) {
@@ -377,18 +368,18 @@ window.setInterval(function() {
 
 
 // health bar decline
-window.setInterval(function() {
+window.setInterval(() => {
   if (healthLevel > 0 && superFruitCounter === 0) {
     healthLevel--;
     setHealth();
   } else if (document.getElementById('sleep').childNodes.length > 4 && superFruitCounter === 0) {
     healthLevel = 50;
     setHealth();
-    addParagraphToDialog("Don't push yourself too hard!" + 
+    addParagraphToDialog("Don't push yourself too hard!" +
       ' Watch your health bar, if it gets to 0%, you will ' +
       'automatically sleep for 5 seconds. Alternatively, ' +
       'fuel yourself with nut bars!');
-    let sleepDiv = document.getElementById('sleep');
+    const sleepDiv = document.getElementById('sleep');
     while (sleepDiv.firstChild) {
       sleepDiv.removeChild(sleepDiv.firstChild);
     }
@@ -401,19 +392,19 @@ window.setInterval(function() {
   }
 }, healthDeclineRate);
 
-window.setInterval(function() {
+window.setInterval(() => {
   // calculations for spacing out the increase of distance
   let numUpgrades = 0;
-  let upgradesArray = [numRobo, numOcto, numDog, numSuperDog];
+  const upgradesArray = [numRobo, numOcto, numDog, numSuperDog];
   for (let i = 0; i < upgradesArray.length; i++) {
     if (upgradesArray[i] > 0) {
       numUpgrades++;
     }
   }
-  setTimeout(() => {run(numRobo * 5)}, 1000 / numUpgrades);
-  setTimeout(() => {run(numOcto*15)}, 2*1000 / numUpgrades);
-  setTimeout(() => {run(numDog*25)}, 3*1000 / numUpgrades);
-  setTimeout(() => {run(numSuperDog * 50)}, 4 * 1000 / numUpgrades);
+  setTimeout(() => { run(numRobo * 5); }, 1000 / numUpgrades);
+  setTimeout(() => { run(numOcto * 15); }, 2 * 1000 / numUpgrades);
+  setTimeout(() => { run(numDog * 25); }, 3 * 1000 / numUpgrades);
+  setTimeout(() => { run(numSuperDog * 50); }, 4 * 1000 / numUpgrades);
 
   // game end
   if (distance >= 200000) {
@@ -428,36 +419,36 @@ window.setInterval(function() {
   }
 
   // save the sate of the game
-  let save = {
+  const save = {
     upgrades: {
-      numShoes: numShoes,
-      numRobo: numRobo,
-      numOcto: numOcto,
-      numDog: numDog,
-      numSuperDog: numSuperDog,
-      priceShoes: priceShoes,
-      priceRobo: priceRobo,
-      priceOcto: priceOcto,
-      priceDog: priceDog,
-      priceSuperDog: priceSuperDog,
-      inventory: inventory,
+      numShoes,
+      numRobo,
+      numOcto,
+      numDog,
+      numSuperDog,
+      priceShoes,
+      priceRobo,
+      priceOcto,
+      priceDog,
+      priceSuperDog,
+      inventory,
     },
     health: {
-      healthLevel: healthLevel,
-      healthDeclineRate: healthDeclineRate,
-      numBars: numBars,
-      numFruit: numFruit,
+      healthLevel,
+      healthDeclineRate,
+      numBars,
+      numFruit,
     },
     currentState: {
-      distance: distance,
-      perClick: perClick,
-      superFruitCounter: superFruitCounter,
-    }
-  }
+      distance,
+      perClick,
+      superFruitCounter,
+    },
+  };
 
   try {
     localStorage.setItem('save', JSON.stringify(save));
-  } catch(error) {
+  } catch (error) {
     console.error(error);
   }
 }, 1000);
@@ -500,9 +491,3 @@ export function nigerCheat() {
 export function fruitCheat() {
   numFruit++;
 }
-
-
-
-//TODO: deactivate your nut bars button (and superfruit button) when you're in superfruit mode
-//TODO: save on not every frame
-

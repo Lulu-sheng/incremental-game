@@ -1,6 +1,6 @@
 import {addFruit, addParagraphToDialog} from './index';
 class Location {
-  constructor(name, color, introMessage, hasSuperfruit, atDistance, path, map) {
+  constructor (name, color, introMessage, hasSuperfruit, atDistance, path, map) {
     this.name = name;
     this.color = color;
     this.introMessage = introMessage;
@@ -62,7 +62,7 @@ class Location {
     ___
    /   \\
   /     \\
-`
+`;
     } else if (path === 'road') {
       this.path = 
 `|     ||     |
@@ -118,7 +118,7 @@ class Location {
 |     ||     |
 |     ||     |
 |     ||     |
-        `
+        `;
     } else if (path === 'desert') {
       this.path = 
 `     /||\\
@@ -171,7 +171,7 @@ class Location {
      ||||
      ||||
 ~~~~~||||~~~
-        `
+        `;
     } else if (path === 'rainy') {
       this.path = 
 `      (  )___
@@ -224,7 +224,7 @@ class Location {
   / /(_) (__)
  / / / / / /
 / / / / / /
-      `
+      `;
     } else if (path === 'city') {
       this.path = 
 `     _____  
@@ -277,23 +277,21 @@ class Location {
 |++++|=|=|=|=|
 |++++|=|=|=|=|
 |+HH+| _HHHH_|
-        `
+        `;
     }
   }
 
   setLocation() {
-    // only on the initial load
-    if (document.getElementById('loc_name').innerHTML != this.name) {
-      document.getElementById('loc_name').innerHTML = this.name;
-      document.getElementById('map').innerHTML = this.map;
-      document.body.style.backgroundColor = this.color;
-      addParagraphToDialog(this.introMessage);
-      if (this.hasSuperfruit && Math.random() > 0.5) {
-        addParagraphToDialog('You picked up a superfruit... use it wisely');
-        addFruit();
-      }
-      document.getElementById('road').innerHTML = this.path;
+    if (document.getElementById('loc_name').innerHTML === this.name) { return; }
+    document.getElementById('loc_name').innerHTML = this.name;
+    document.getElementById('map').innerHTML = this.map;
+    document.body.style.backgroundColor = this.color;
+    addParagraphToDialog(this.introMessage);
+    if (this.hasSuperfruit && Math.random() > 0.5) {
+      addParagraphToDialog('You picked up a superfruit... use it wisely');
+      addFruit();
     }
+    document.getElementById('road').innerHTML = this.path;
   }
 }
 
