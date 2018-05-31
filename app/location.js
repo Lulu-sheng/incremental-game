@@ -1,11 +1,11 @@
-import {add_fruit, addParagraphToDialog} from './index'
+import {addFruit, addParagraphToDialog} from './index';
 class Location {
-  constructor(name, color, intro_message, has_superfruit, at_distance, path, map) {
+  constructor(name, color, introMessage, hasSuperfruit, atDistance, path, map) {
     this.name = name;
     this.color = color;
-    this.intro_message = intro_message;
-    this.has_superfruit = has_superfruit;
-    this.at_distance = at_distance;
+    this.introMessage = introMessage;
+    this.hasSuperfruit = hasSuperfruit;
+    this.atDistance = atDistance;
     this.map = map;
     if (path === 'mountains') {
       this.path = `
@@ -281,16 +281,16 @@ class Location {
     }
   }
 
-  set_location() {
+  setLocation() {
     // only on the initial load
     if (document.getElementById('loc_name').innerHTML != this.name) {
       document.getElementById('loc_name').innerHTML = this.name;
       document.getElementById('map').innerHTML = this.map;
       document.body.style.backgroundColor = this.color;
-      addParagraphToDialog(this.intro_message);
-      if (this.has_superfruit && Math.random() > 0.5) {
+      addParagraphToDialog(this.introMessage);
+      if (this.hasSuperfruit && Math.random() > 0.5) {
         addParagraphToDialog('You picked up a superfruit... use it wisely');
-        add_fruit();
+        addFruit();
       }
       document.getElementById('road').innerHTML = this.path;
     }
