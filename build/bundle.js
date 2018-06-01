@@ -8901,249 +8901,592 @@
 
 /***/ }),
 /* 327 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.addParagraphToDialog = addParagraphToDialog;
+	exports.addFruit = addFruit;
+	exports.restartCheat = restartCheat;
+	exports.endCheat = endCheat;
+	exports.bcCheat = bcCheat;
+	exports.laCheat = laCheat;
+	exports.sjCheat = sjCheat;
+	exports.argentinaCheat = argentinaCheat;
+	exports.oceanCheat = oceanCheat;
+	exports.nigerCheat = nigerCheat;
+	exports.fruitCheat = fruitCheat;
+
+	var _locationsArray = __webpack_require__(328);
 
 	// keep track of variables
-	var base_shoe_price = 20;
-	var base_robo_price = 50;
-	var base_octo_price = 100;
-	var base_dog_price = 600;
-	var base_super_dog_price = 1000;
+	var baseShoePrice = 20;
+	var baseRoboPrice = 50;
+	var baseOctoPrice = 100;
+	var baseDogPrice = 600;
+	var baseSuperDogPrice = 1000;
 
 	var distance = 0;
-	var per_click = 1;
-	var num_shoes = 0;
-	var num_robo = 0;
-	var num_octo = 0;
-	var num_dog = 0;
-	var num_super_dog = 0;
-	var price_shoes = base_shoe_price;
-	var price_robo = base_robo_price;
-	var price_octo = base_octo_price;
-	var price_dog = base_dog_price;
-	var price_super_dog = base_super_dog_price;
-	var health_level = 50;
-	var health_decline_rate = 1000;
+	var perClick = 1;
+	var numShoes = 0;
+	var numRobo = 0;
+	var numOcto = 0;
+	var numDog = 0;
+	var numSuperDog = 0;
+	var priceShoes = baseShoePrice;
+	var priceRobo = baseRoboPrice;
+	var priceOcto = baseOctoPrice;
+	var priceDog = baseDogPrice;
+	var priceSuperDog = baseSuperDogPrice;
+	var healthLevel = 50;
+	var healthDeclineRate = 1000;
 	var inventory = 0;
-
-	var savegame = JSON.parse(localStorage.getItem("save"));
-	if (typeof localStorage.getItem("save") === 'undefined') {
-	  alert("Welcome to The Ultimate Run");
-	} else {
-	  if (typeof savegame.upgrades !== "undefined") {
-	    num_shoes = parseInt(savegame.upgrades.num_shoes);
-	    num_robo = parseInt(savegame.upgrades.num_robo);
-	    num_octo = parseInt(savegame.upgrades.num_octo);
-	    num_dog = parseInt(savegame.upgrades.num_dog);
-	    num_super_dog = parseInt(savegame.upgrades.num_super_dog);
-	    price_shoes = parseInt(savegame.upgrades.price_shoes);
-	    price_robo = parseInt(savegame.upgrades.price_robo);
-	    price_octo = parseInt(savegame.upgrades.price_octo);
-	    price_dog = parseInt(savegame.upgrades.price_dog);
-	    price_super_dog = parseInt(savegame.upgrades.price_super_dog);
-	    inventory = parseInt(savegame.upgrades.inventory);
-	  }
-	  if (typeof savegame.health !== "undefined") {
-	    health_level = parseInt(savegame.health.health_level);
-	    health_decline_rate = parseInt(savegame.health.health_decline_rate);
-	  }
-	  if (typeof savegame.current_state !== "undefined") {
-	    distance = parseInt(savegame.current_state.distance);
-	    per_click = parseInt(savegame.current_state.per_click);
-	  }
-	}
+	var numBars = 0;
+	var numFruit = 0;
+	var superFruitCounter = 0;
 
 	// helper functions
-	function activate_button(button) {
-	  document.getElementById(button).removeAttribute("disabled");
+	function activateButton(button) {
+	  document.getElementById(button).removeAttribute('disabled');
 	}
 
-	function deactivate_button(button) {
-	  document.getElementById(button).setAtrribute("disabled", "disabled");
+	function deactivateButton(button) {
+	  document.getElementById(button).setAttribute('disabled', 'disabled');
 	}
 
 	function run(number) {
-	  distance = distance + number;
-	  document.getElementById("distance").innerHTML = distance;
-	};
+	  if (healthLevel <= 0) {
+	    return;
+	  }
+	  distance += number;
+	  document.getElementById('distance').innerHTML = numberFormat(distance);
+	}
 
-	document.getElementById("clickButton").addEventListener('click', function () {
-	  run(per_click);
-	});
+	function restart() {
+	  distance = 0;
+	  perClick = 1;
+	  numShoes = 0;
+	  numRobo = 0;
+	  numOcto = 0;
+	  numDog = 0;
+	  numSuperDog = 0;
+	  priceShoes = baseShoePrice;
+	  priceRobo = baseRoboPrice;
+	  priceOcto = baseOctoPrice;
+	  priceDog = baseDogPrice;
+	  priceSuperDog = baseSuperDogPrice;
+	  healthLevel = 50;
+	  healthDeclineRate = 1000;
+	  inventory = 0;
+	  numBars = 0;
+	  superFruitCounter = 0;
+	  numFruit = 0;
+	  var dialog = document.getElementById('dialog');
 
+	  while (dialog.firstChild) {
+	    dialog.removeChild(dialog.firstChild);
+	  }
+	}
+
+	function determineLocation() {
+	  for (var i = _locationsArray.locations.length - 1; i >= 0; i--) {
+	    if (_locationsArray.locations[i].atDistance <= distance) {
+	      _locationsArray.locations[i].setLocation();
+	      break;
+	    }
+	  }
+	}
+
+	function setHealth() {
+	  var html = '[';
+	  for (var i = 0; i < healthLevel; i++) {
+	    html += '#';
+	  }
+	  for (var _i = 0; _i < 50 - healthLevel; _i++) {
+	    html += '-';
+	  }
+	  html += '] ' + Math.floor(healthLevel / 50 * 100) + '% health-level';
+	  document.getElementById('health-bar').innerHTML = html;
+	  document.getElementById('night').style.opacity = 0.8 - healthLevel / 50;
+	}
+
+	function updateHtml() {
+	  document.getElementById('distance').innerHTML = numberFormat(distance);
+	  document.getElementById('per_click').innerHTML = perClick;
+	  document.getElementById('num_shoes').innerHTML = numShoes;
+	  document.getElementById('price_shoes').innerHTML = numberFormat(priceShoes);
+	  document.getElementById('num_robo').innerHTML = numRobo;
+	  document.getElementById('price_robo').innerHTML = numberFormat(priceRobo);
+	  document.getElementById('num_octo').innerHTML = numOcto;
+	  document.getElementById('price_octo').innerHTML = numberFormat(priceOcto);
+	  document.getElementById('num_dog').innerHTML = numDog;
+	  document.getElementById('price_dog').innerHTML = numberFormat(priceDog);
+	  document.getElementById('num_super_dog').innerHTML = numSuperDog;
+	  document.getElementById('price_super_dog').innerHTML = numberFormat(priceSuperDog);
+	  document.getElementById('num_bars').innerHTML = numBars;
+	  document.getElementById('num_fruit').innerHTML = numFruit;
+	}
+
+	function updateButtons() {
+	  if (distance >= priceShoes && healthLevel > 0) {
+	    activateButton('buyShoes');
+	  } else {
+	    deactivateButton('buyShoes');
+	  }
+
+	  if (numFruit > 0 && healthLevel > 0) {
+	    activateButton('eatSuperFruit');
+	  } else {
+	    deactivateButton('eatSuperFruit');
+	  }
+
+	  if (numBars > 0 && healthLevel > 0) {
+	    activateButton('eatNutBarAction');
+	  } else {
+	    deactivateButton('eatNutBarAction');
+	  }
+
+	  if (distance >= priceRobo && healthLevel > 0) {
+	    activateButton('buyRobo');
+	  } else {
+	    deactivateButton('buyRobo');
+	  }
+
+	  if (distance >= priceOcto && healthLevel > 0) {
+	    activateButton('buyOcto');
+	  } else {
+	    deactivateButton('buyOcto');
+	  }
+
+	  if (distance >= priceDog && healthLevel > 0) {
+	    activateButton('buyDog');
+	  } else {
+	    deactivateButton('buyDog');
+	  }
+
+	  if (distance >= priceSuperDog && healthLevel > 0) {
+	    activateButton('buySuperDog');
+	  } else {
+	    deactivateButton('buySuperDog');
+	  }
+
+	  if (distance >= priceShoes && healthLevel > 0) {
+	    activateButton('buyShoes');
+	  } else {
+	    deactivateButton('buyShoes');
+	  }
+	}
+
+	function numberFormat(x) {
+	  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	}
+
+	// functions that are used by locations.js
 	function addParagraphToDialog(text) {
-	  var newParagraph = document.createElement("P");
+	  var newParagraph = document.createElement('P');
 	  var newContent = document.createTextNode(text);
 	  newParagraph.appendChild(newContent);
-	  var dialog = document.getElementById("dialog");
+	  var dialog = document.getElementById('dialog');
 	  dialog.insertBefore(newParagraph, dialog.childNodes[0]);
 	}
 
-	// event handler for buying shoes
-	document.getElementById("buyShoes").addEventListener('click', function () {
-	  if (distance >= price_shoes) {
-	    num_shoes = num_shoes + 1;
-	    inventory = inventory + 1;
-	    distance = distance - price_shoes;
-	    per_click = per_click + 1;
-	    price_shoes = Math.floor(base_shoe_price * Math.pow(1.1, num_shoes));
-	    addParagraphToDialog("Awesome! Harnessed with your new kicks, you get to run a tad bit faster.");
+	function addFruit() {
+	  numFruit++;
+	}
+
+	// load everything
+	window.onload = function () {
+	  try {
+	    var savegame = JSON.parse(localStorage.getItem('save'));
+	    if (savegame == null) {
+	      alert('Welcome to The Ultra Ultra Ultra Marathon (200,000km edition)');
+	    } else {
+	      if (typeof savegame.upgrades !== 'undefined') {
+	        numShoes = parseInt(savegame.upgrades.numShoes, 10);
+	        numRobo = parseInt(savegame.upgrades.numRobo, 10);
+	        numOcto = parseInt(savegame.upgrades.numOcto, 10);
+	        numDog = parseInt(savegame.upgrades.numDog, 10);
+	        numSuperDog = parseInt(savegame.upgrades.numSuperDog, 10);
+	        priceShoes = parseInt(savegame.upgrades.priceShoes, 10);
+	        priceRobo = parseInt(savegame.upgrades.priceRobo, 10);
+	        priceOcto = parseInt(savegame.upgrades.priceOcto, 10);
+	        priceDog = parseInt(savegame.upgrades.priceDog, 10);
+	        priceSuperDog = parseInt(savegame.upgrades.priceSuperDog, 10);
+	        inventory = parseInt(savegame.upgrades.inventory, 10);
+	      }
+	      if (typeof savegame.health !== 'undefined') {
+	        healthLevel = parseInt(savegame.health.healthLevel, 10);
+	        healthDeclineRate = parseInt(savegame.health.healthDeclineRate, 10);
+	        numBars = parseInt(savegame.health.numBars, 10);
+	        numFruit = parseInt(savegame.health.numFruit, 10);
+	      }
+	      if (typeof savegame.currentState !== 'undefined') {
+	        distance = parseInt(savegame.currentState.distance, 10);
+	        perClick = parseInt(savegame.currentState.perClick, 10);
+	        superFruitCounter = parseInt(savegame.currentState.superFruitCounter, 10);
+	      }
+	    }
+	    // after loading the data from the localStorage,
+	    // reset the elements of the display
+	    setHealth();
+	    updateHtml();
+	    updateButtons();
+	    determineLocation();
+	  } catch (error) {
+	    console.error(error);
 	  }
+	};
+
+	document.getElementById('clickButton').addEventListener('click', function () {
+	  run(perClick);
+	});
+
+	document.getElementById('map_button').addEventListener('click', function () {
+	  var button = document.getElementById('map_button');
+	  if (button.innerHTML === 'HIDE MAP') {
+	    button.innerHTML = 'SHOW MAP';
+	    document.getElementById('map').style.display = 'none';
+	    document.getElementById('map_caption').style.display = 'none';
+	  } else {
+	    button.innerHTML = 'HIDE MAP';
+	    document.getElementById('map').style.display = 'block';
+	    document.getElementById('map_caption').style.display = 'block';
+	  }
+	});
+
+	document.getElementById('eatNutBarAction').addEventListener('click', function () {
+	  if (healthLevel === 0) {
+	    return;
+	  }
+	  healthLevel += numBars * 5 + healthLevel > 50 ? 50 - healthLevel : numBars * 5;
+	  numBars = 0;
+	});
+
+	document.getElementById('eatSuperFruit').addEventListener('click', function () {
+	  if (numFruit <= 0) {
+	    return;
+	  }
+	  numFruit--;
+	  superFruitCounter = 10;
+	  var fruitTimer = window.setInterval(function () {
+	    if (superFruitCounter > 0) {
+	      superFruitCounter--;
+	    } else {
+	      clearInterval(fruitTimer);
+	    }
+	  }, 60000);
+	});
+
+	// event handler for buying shoes
+	document.getElementById('buyShoes').addEventListener('click', function () {
+	  if (distance < priceShoes) {
+	    return;
+	  }
+	  numShoes++;
+	  inventory++;
+	  distance -= priceShoes;
+	  perClick++;
+	  priceShoes = Math.floor(baseShoePrice * Math.pow(1.1, numShoes));
+	  addParagraphToDialog('Awesome! Harnessed with your new kicks, ' + 'you get to run a tad bit faster.');
 	});
 
 	// event handler for buying robotic legs
-	document.getElementById("buyRobo").addEventListener('click', function () {
-	  if (distance >= price_robo) {
-	    num_robo = num_robo + 1;
-	    inventory = inventory + 1;
-	    distance = distance - price_robo;
-	    price_robo = Math.floor(base_robo_price * Math.pow(1.1, num_robo));
-	    addParagraphToDialog("Swagilicious legs my friend! Now you can let your new legs do the work for you. Automatic running!");
+	document.getElementById('buyRobo').addEventListener('click', function () {
+	  if (distance < priceRobo) {
+	    return;
 	  }
+	  numRobo++;
+	  inventory++;
+	  distance -= priceRobo;
+	  priceRobo = Math.floor(baseRoboPrice * Math.pow(1.1, numRobo));
+	  addParagraphToDialog('Swagilicious legs my friend! ' + 'Now you can let your new legs do the work for you. ' + 'Automatic running!');
 	});
 
 	// event handler for buying octopus legs
-	document.getElementById("buyOcto").addEventListener('click', function () {
-	  if (distance >= price_octo) {
-	    num_octo = num_octo + 1;
-	    inventory = inventory + 1;
-	    distance = distance - price_octo;
-	    price_octo = Math.floor(base_octo_price * Math.pow(1.1, num_octo));
-	    addParagraphToDialog("Cheetah what? New studies show that octopi are the fastest creatures to ever live, and you got their legs!");
+	document.getElementById('buyOcto').addEventListener('click', function () {
+	  if (distance < priceOcto) {
+	    return;
 	  }
+	  numOcto++;
+	  inventory++;
+	  distance -= priceOcto;
+	  priceOcto = Math.floor(baseOctoPrice * Math.pow(1.1, numOcto));
+	  addParagraphToDialog('Cheetah what? New studies show that octopi ' + 'are the fastest creatures to ever live, and you got their legs!');
 	});
 
 	// event handler for buying dog
-	document.getElementById("buyDog").addEventListener('click', function () {
-	  if (distance >= price_dog) {
-	    num_dog = num_dog + 1;
-	    inventory = inventory + 1;
-	    distance = distance - price_dog;
-	    price_dog = Math.floor(base_dog_price * Math.pow(1.1, num_dog));
-	    addParagraphToDialog("Dogs are truly man's best friend. Your dog's mileage also counts towards your total distance covered");
+	document.getElementById('buyDog').addEventListener('click', function () {
+	  if (distance < priceDog) {
+	    return;
 	  }
+	  numDog++;
+	  inventory++;
+	  distance -= priceDog;
+	  priceDog = Math.floor(baseDogPrice * Math.pow(1.15, numDog));
+	  addParagraphToDialog("Dogs are truly man's best friend. Your dog's " + 'mileage also counts towards your total distance covered');
 	});
 
 	// event handler for buying super dog
-	document.getElementById("buySuperDog").addEventListener('click', function () {
-	  if (distance >= price_super_dog) {
-	    num_super_dog = num_super_dog + 1;
-	    inventory = inventory + 1;
-	    distance = distance - price_super_dog;
-	    price_super_dog = Math.floor(base_super_dog_price * Math.pow(1.1, num_super_dog));
-	    addParagraphToDialog("This dog runs like a pro, helping you rake in those miles like no other");
+	document.getElementById('buySuperDog').addEventListener('click', function () {
+	  if (distance < priceSuperDog) {
+	    return;
 	  }
+	  numSuperDog++;
+	  inventory++;
+	  distance -= priceSuperDog;
+	  priceSuperDog = Math.floor(baseSuperDogPrice * Math.pow(1.15, numSuperDog));
+	  addParagraphToDialog('This dog runs like a pro, helping you ' + 'rake in those miles like no other');
 	});
 
+	// check and update the display frequently
 	window.setInterval(function () {
-	  document.getElementById('distance').innerHTML = distance;
-	  document.getElementById('per_click').innerHTML = per_click;
-	  document.getElementById('num_shoes').innerHTML = num_shoes;
-	  document.getElementById('price_shoes').innerHTML = price_shoes;
-	  document.getElementById('num_robo').innerHTML = num_robo;
-	  document.getElementById('price_robo').innerHTML = price_robo;
-	  document.getElementById('num_octo').innerHTML = num_octo;
-	  document.getElementById('price_octo').innerHTML = price_octo;
-	  document.getElementById('num_dog').innerHTML = num_dog;
-	  document.getElementById('price_dog').innerHTML = price_dog;
-	  document.getElementById('num_super_dog').innerHTML = num_super_dog;
-	  document.getElementById('price_super_dog').innerHTML = price_super_dog;
+	  updateHtml();
+	  updateButtons();
+	  determineLocation();
 	}, 100);
 
-	// motivational messages
+	// loop function call for animating the running man
+	(function loop() {
+	  var runningMan = document.getElementById('running-man');
+	  if (healthLevel <= 0) {
+	    runningMan.style.color = 'white';
+	    runningMan.innerHTML = '\n\n    z\n     z  ||  /\n      O----/--   \n\n    ';
+	  } else if (runningMan.innerHTML.match(/_O/) === null) {
+	    runningMan.style.color = 'black';
+	    runningMan.innerHTML = '\n    _O/\n      \\\n      /\\_\n      \\  `\n      `\n    ';
+	  } else {
+	    runningMan.style.color = 'black';
+	    runningMan.innerHTML = '\n      \\O_  \n   ,/\\/\n     /\n     \\\n     `\n    ';
+	  }
+	  window.setTimeout(loop, 1200 - 800 * (healthLevel / 50));
+	})();
+
+	// Display random motivational messages
 	window.setInterval(function () {
 	  var random = Math.random();
 	  if (random < 0.25) {
-	    addParagraphToDialog("Keep on going!");
+	    addParagraphToDialog('Keep on going!');
 	  } else if (random < 0.5) {
-	    addParagraphToDialog("Push through the pain!");
+	    addParagraphToDialog('Push through the pain!');
 	  } else if (random < 0.75) {
-	    addParagraphToDialog("One foot in front of the other!");
+	    addParagraphToDialog('One foot in front of the other!');
 	  } else {
-	    addParagraphToDialog("Keep on running!");
+	    addParagraphToDialog('Keep on running!');
 	  }
 	}, 10000);
 
-	function decline_health() {
-	  health_level--;
-	  var html = '[';
-	  for (var i = 0; i < health_level; i++) {
-	    html += '#';
-	  }
-	  for (var _i = 0; _i < 50 - health_level; _i++) {
-	    html += '-';
-	  }
-	  html += "] " + Math.floor(health_level / 50 * 100) + "% health-level";
-	  document.getElementById('health-bar').innerHTML = html;
-	  document.getElementById('night').style.opacity = 0.8 - health_level / 50;
-	}
-
 	// health bar decline
 	window.setInterval(function () {
-	  if (health_level > 0) {
-	    decline_health();
-	  } else if (document.getElementById('sleep').childNodes.length > 4) {
-	    health_level = 50;
-	    addParagraphToDialog("Don't push yourself too hard! Watch your health bar, if it get's to 0%, you will automatically sleep for 5 seconds. Alternatively, fuel yourself with nut bars and sleep!");
-	    var sleep_div = document.getElementById('sleep');
-	    while (sleep_div.firstChild) {
-	      sleep_div.removeChild(sleep_div.firstChild);
+	  if (healthLevel > 0 && superFruitCounter === 0) {
+	    healthLevel--;
+	    setHealth();
+	  } else if (document.getElementById('sleep').childNodes.length > 4 && superFruitCounter === 0) {
+	    healthLevel = 50;
+	    setHealth();
+	    addParagraphToDialog("Don't push yourself too hard!" + ' Watch your health bar, if it gets to 0%, you will ' + 'automatically sleep for 5 seconds. Alternatively, ' + 'fuel yourself with nut bars!');
+	    var sleepDiv = document.getElementById('sleep');
+	    while (sleepDiv.firstChild) {
+	      sleepDiv.removeChild(sleepDiv.firstChild);
 	    }
-	  } else {
-	    var newParagraph = document.createElement("P");
+	  } else if (superFruitCounter === 0) {
+	    var newParagraph = document.createElement('P');
 	    newParagraph.style.color = 'white';
-	    var newContent = document.createTextNode("zzZZZzzZZZzzz");
+	    var newContent = document.createTextNode('zzZZZzzZZZzzz');
 	    newParagraph.appendChild(newContent);
-	    document.getElementById("sleep").appendChild(newParagraph);
+	    document.getElementById('sleep').appendChild(newParagraph);
 	  }
-	}, health_decline_rate);
+	}, healthDeclineRate);
 
-	//... maybe separate these into their separate functions so that
-	//we can see the progress and it's not just jumpy every minute
 	window.setInterval(function () {
-	  run(num_robo);
-	  run(num_robo * 5);
-	  run(num_octo * 10);
-	  run(num_dog * 13);
-	  run(num_super_dog * 40);
+	  // calculations for spacing out the increase of distance
+	  var numUpgrades = 0;
+	  var upgradesArray = [numRobo, numOcto, numDog, numSuperDog];
+	  for (var i = 0; i < upgradesArray.length; i++) {
+	    if (upgradesArray[i] > 0) {
+	      numUpgrades++;
+	    }
+	  }
+	  setTimeout(function () {
+	    run(numRobo * 5);
+	  }, 1000 / numUpgrades);
+	  setTimeout(function () {
+	    run(numOcto * 15);
+	  }, 2 * 1000 / numUpgrades);
+	  setTimeout(function () {
+	    run(numDog * 25);
+	  }, 3 * 1000 / numUpgrades);
+	  setTimeout(function () {
+	    run(numSuperDog * 50);
+	  }, 4 * 1000 / numUpgrades);
 
-	  // put this is another setInterval...
-	  // also this is a bit glitchy!
+	  // game end
+	  if (distance >= 200000) {
+	    alert("You've ran 20,000km and beat the game! The game is automatically restarted");
+	    restart();
+	  }
+
+	  // skewed random nut bar finding
+	  if (Math.random() > 0.9) {
+	    numBars += 1;
+	    addParagraphToDialog('You found a nut bar');
+	  }
+
+	  // save the sate of the game
 	  var save = {
 	    upgrades: {
-	      num_shoes: num_shoes,
-	      num_robo: num_robo,
-	      num_octo: num_octo,
-	      num_dog: num_dog,
-	      num_super_dog: num_super_dog,
-	      price_shoes: price_shoes,
-	      price_robo: price_robo,
-	      price_octo: price_octo,
-	      price_dog: price_dog,
-	      price_super_dog: price_super_dog,
+	      numShoes: numShoes,
+	      numRobo: numRobo,
+	      numOcto: numOcto,
+	      numDog: numDog,
+	      numSuperDog: numSuperDog,
+	      priceShoes: priceShoes,
+	      priceRobo: priceRobo,
+	      priceOcto: priceOcto,
+	      priceDog: priceDog,
+	      priceSuperDog: priceSuperDog,
 	      inventory: inventory
 	    },
 	    health: {
-	      health_level: health_level,
-	      health_decline_rate: health_decline_rate
+	      healthLevel: healthLevel,
+	      healthDeclineRate: healthDeclineRate,
+	      numBars: numBars,
+	      numFruit: numFruit
 	    },
-	    current_state: {
+	    currentState: {
 	      distance: distance,
-	      per_click: per_click
+	      perClick: perClick,
+	      superFruitCounter: superFruitCounter
 	    }
 	  };
-	  localStorage.setItem("save", JSON.stringify(save));
+
+	  try {
+	    localStorage.setItem('save', JSON.stringify(save));
+	  } catch (error) {
+	    console.error(error);
+	  }
 	}, 1000);
 
-	function cheat() {
-	  console.log("cheat");
+	// beginning-end game cheats
+	function restartCheat() {
+	  restart();
 	}
 
-	// map
-	// pick up random stuff - text box
-	// sleep, eat nutbars, eat superfruit
+	function endCheat() {
+	  distance = 199999;
+	}
+
+	// locational cheats
+	function bcCheat() {
+	  distance = 2000;
+	}
+
+	function laCheat() {
+	  distance = 6000;
+	}
+
+	function sjCheat() {
+	  distance = 12000;
+	}
+
+	function argentinaCheat() {
+	  distance = 20000;
+	}
+
+	function oceanCheat() {
+	  distance = 50000;
+	}
+
+	function nigerCheat() {
+	  distance = 100000;
+	}
+
+	function fruitCheat() {
+	  numFruit++;
+	}
+
+/***/ }),
+/* 328 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.locations = undefined;
+
+	var _location = __webpack_require__(329);
+
+	var _location2 = _interopRequireDefault(_location);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var locations = exports.locations = [new _location2.default('Ottawa, CAN', '#ffffff', 'Welcome to Ottawa!', false, 0, 'road', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,       \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'|        \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\        /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |       /            ._-~\'\\_ _~|              \\ ) /           \n            \\   __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\ |,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-_\'  _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\_,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   /     \\_       ~ |      /         \\  ~\'; -,_.         \n                   |       ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,      /        \\    / /|            ,-, ,   -,     \n                     |    ,/          |  |\' |/          ,-   ~ \\   \'.    \n                    ,|   ,/           \\ ,/              \\       |        \n                    /    |             ~                 -~~-, /   _     \n                    |  ,-\'                                    ~    /     \n                    / ,\'                                      ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('British Colombia, CAN', '#bbdefb', 'Welcome to British Columbia!', false, 2000, 'mountains', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\        /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |       /            ._-~\'\\_ _~|              \\ ) /           \n            \\   __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\ |,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-_\'  _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\_,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   /     \\_       ~ |      /         \\  ~\'; -,_.         \n                   |       ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,      /        \\    / /|            ,-, ,   -,     \n                     |    ,/          |  |\' |/          ,-   ~ \\   \'.    \n                    ,|   ,/           \\ ,/              \\       |        \n                    /    |             ~                 -~~-, /   _     \n                    |  ,-\'                                    ~    /     \n                    / ,\'                                      ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('Los Angelos, USA', '#ffe082', 'Welcome to Los Angelos!', false, 6000, 'city', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\*       /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |*      /            ._-~\'\\_ _~|              \\ ) /           \n            \\   __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\ |,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-_\'  _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\_,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   /     \\_       ~ |      /         \\  ~\'; -,_.         \n                   |       ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,      /        \\    / /|            ,-, ,   -,     \n                     |    ,/          |  |\' |/          ,-   ~ \\   \'.    \n                    ,|   ,/           \\ ,/              \\       |        \n                    /    |             ~                 -~~-, /   _     \n                    |  ,-\'                                    ~    /     \n                    / ,\'                                      ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('San José, Costa Rica', '#aed581', 'Welcome to San José!', true, 12000, 'rainy', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\*       /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |*      /            ._-~\'\\_ _~|              \\ ) /           \n            \\*  __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\*|,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-*\' _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\*,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   /     \\_       ~ |      /         \\  ~\'; -,_.         \n                   |       ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,      /        \\    / /|            ,-, ,   -,     \n                     |    ,/          |  |\' |/          ,-   ~ \\   \'.    \n                    ,|   ,/           \\ ,/              \\       |        \n                    /    |             ~                 -~~-, /   _     \n                    |  ,-\'                                    ~    /     \n                    / ,\'                                      ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('Patagonian Desert, Argentina', '#fff59d', 'Welcome to The Patagonian Desert!', false, 20000, 'desert', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\*       /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |*      /            ._-~\'\\_ _~|              \\ ) /           \n            \\*  __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\*|,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-*\' _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\*,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   / *   \\_       ~ |      /         \\  ~\'; -,_.         \n                   |  *    ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,*     /        \\    / /|            ,-, ,   -,     \n                     | *  ,/          |  |\' |/          ,-   ~ \\   \'.    \n                    ,|*  ,/           \\ ,/              \\       |        \n                    / *  |             ~                 -~~-, /   _     \n                    |* ,-\'                                    ~    /     \n                    / ,\'                                      ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('Atlantic Ocean', '#80cbc4', 'Welcome to the Atlantic Ocean!', false, 50000, 'rainy', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\*       /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |*      /            ._-~\'\\_ _~|              \\ ) /           \n            \\*  __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\*|,  ~-_      - |          \\\\_\' ~|  /\\  \\~ ,              \n               ~-*\' _;       \'\\           \'-,   \\,\' /\\/  |              \n                 \'\\*,~\'\\_       \\_ _,       /\'    \'  |, /|\'              \n                   / *   \\_       ~ |      /         \\  ~\'; -,_.         \n                   |  *    ~\\        |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,*     / *      \\    / /|            ,-, ,   -,     \n                     | *  ,/ **       |  |\' |/          ,-   ~ \\   \'.    \n                    ,|*  ,/ *         \\ ,/              \\       |        \n                    / *  | *           ~                 -~~-, /   _     \n                    |* ,-\'*                                   ~    /     \n                    / *\'**                                    ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n'), new _location2.default('Agadez, Niger', '#ffcdd2', 'Welcome to Agadez!', true, 100000, 'desert', '\n------------------------------------------------------------------------\n              ,_   .  ._. _.  .                                         \n           , _-\\\',\'|~\\~      ~/      ;-\'_   _-\'     ,;_;_,    ~~-        \n  /~~-\\_/-\'~\'--\' \\~~| \',    ,\'      /  / ~|-_\\_/~/~      ~~--~~~~\'--_    \n  /             *,/\'-/~ \'\\ ,\' _  , \'|,\'|~                   ._/-, /~     \n  ~/-\'~\\_,   **  \'-,| \'|. \'   ~  ,\\ /\'~                /    /_  /~       \n -~      \'| **     \'\',\\~|\\       _\\~     ,_  ,               /|          \n          \'\\*       /\'~          |_/~\\\\,-,~  \\ "         ,_,/ |          \n           |*      /            ._-~\'\\_ _~|              \\ ) /           \n            \\*  __-\\           \'/      ~ |\\  \\_          /  ~            \n  .,         \'\\*|,  ~-_      - | *        \\\\_\' ~|  /\\  \\~ ,              \n               ~-*\' _;       \'\\ *         \'-,   \\,\' /\\/  |              \n                 \'\\*,~\'\\_     * \\_ _,       /\'    \'  |, /|\'              \n                   / *   \\_    *  ~ |      /         \\  ~\'; -,_.         \n                   |  *    ~\\  *     |    |  ,        \'-_, ,; ~ ~\\       \n                    \\,*     / *      \\    / /|            ,-, ,   -,     \n                     | *  ,/ **       |  |\' |/          ,-   ~ \\   \'.    \n                    ,|*  ,/ *         \\ ,/              \\       |        \n                    / *  | *           ~                 -~~-, /   _     \n                    |* ,-\'*                                   ~    /     \n                    / *\'**                                    ~          \n                    \',|  ~                                               \n                      ~\'                                                 \n------------------------------------------------------------------------\n')];
+
+/***/ }),
+/* 329 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _index = __webpack_require__(327);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Location = function () {
+	  function Location(name, color, introMessage, hasSuperfruit, atDistance, path, map) {
+	    _classCallCheck(this, Location);
+
+	    this.name = name;
+	    this.color = color;
+	    this.introMessage = introMessage;
+	    this.hasSuperfruit = hasSuperfruit;
+	    this.atDistance = atDistance;
+	    this.map = map;
+	    if (path === 'mountains') {
+	      this.path = '\n    ___\n   /   \\\n  /     \\\n /       \\\n/         \\\n       ___\n      /   \\\n     /     \\\n    /       \\\n   /         \\\n    ___\n   /   \\\n  /     \\\n /       \\\n/         \\\n       ___\n      /   \\\n     /     \\\n    /       \\\n   /         \\\n    ___\n   /   \\\n  /     \\\n /       \\\n/         \\\n       ___\n      /   \\\n     /     \\\n    /       \\\n   /         \\\n    ___\n   /   \\\n  /     \\\n /       \\\n/         \\\n       ___\n      /   \\\n     /     \\\n    /       \\\n   /         \\\n    ___\n   /   \\\n  /     \\\n /       \\\n/         \\\n       ___\n      /   \\\n     /     \\\n    /       \\\n   /         \\\n    ___\n   /   \\\n  /     \\\n';
+	    } else if (path === 'road') {
+	      this.path = '|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n|     ||     |\n        ';
+	    } else if (path === 'desert') {
+	      this.path = '     /||\\\n     ||||\n     ||||\n     |||| /|\\\n/|\\  |||| |||\n|||  |||| |||\n|||  |||| |||\n|||  |||| d||\n|||  |||||||/\n||b._||||~~\'\n\\||||||||\n`~~~||||\n    ||||\n ~~~||||~~~~~~\n\n      /||\\\n      ||||\n      ||||\n      |||| /|\\\n /|\\  |||| |||\n |||  |||| |||\n |||  |||| |||\n |||  |||| d||\n |||  |||||||/\n ||b._||||~~\'\n \\||||||||\n `~~~||||\n     ||||\n~~~~~||||~~~\n\n     /||\\\n     ||||\n     ||||\n     |||| /|\\\n/|\\  |||| |||\n|||  |||| |||\n|||  |||| |||\n|||  |||| d||\n|||  |||||||/\n||b._||||~~\'\n\\||||||||\n`~~~||||\n    ||||\n ~~~||||~~~~~~\n\n     /||\\\n     ||||\n     ||||\n     ||||\n~~~~~||||~~~\n        ';
+	    } else if (path === 'rainy') {
+	      this.path = '      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      (  )___\n   (_   _    )\n  / /(_) (__)\n / / / / / /\n/ / / / / /\n      ';
+	    } else if (path === 'city') {
+	      this.path = '     _____  \n    |xxxxx|\n    |xxxxx|\n ____xxxxx|\n|++++|xxxx|\n|++++|xxxx|\n|++++|________\n|++++|=|=|=|=|\n|++++|=|=|=|=|\n|+HH+| _HHHH_|\n     _____  \n    |xxxxx|\n    |xxxxx|\n ____xxxxx|\n|++++|xxxx|\n|++++|xxxx|\n|++++|________\n|++++|=|=|=|=|\n|++++|=|=|=|=|\n|+HH+| _HHHH_|\n     _____  \n    |xxxxx|\n    |xxxxx|\n ____xxxxx|\n|++++|xxxx|\n|++++|xxxx|\n|++++|________\n|++++|=|=|=|=|\n|++++|=|=|=|=|\n|+HH+| _HHHH_|\n     _____  \n    |xxxxx|\n    |xxxxx|\n ____xxxxx|\n|++++|xxxx|\n|++++|xxxx|\n|++++|________\n|++++|=|=|=|=|\n|++++|=|=|=|=|\n|+HH+| _HHHH_|\n     _____  \n    |xxxxx|\n    |xxxxx|\n ____xxxxx|\n|++++|xxxx|\n|++++|xxxx|\n|++++|________\n|++++|=|=|=|=|\n|++++|=|=|=|=|\n|+HH+| _HHHH_|\n        ';
+	    }
+	  }
+
+	  _createClass(Location, [{
+	    key: 'setLocation',
+	    value: function setLocation() {
+	      if (document.getElementById('loc_name').innerHTML === this.name) {
+	        return;
+	      }
+	      document.getElementById('loc_name').innerHTML = this.name;
+	      document.getElementById('map').innerHTML = this.map;
+	      document.body.style.backgroundColor = this.color;
+	      (0, _index.addParagraphToDialog)(this.introMessage);
+	      if (this.hasSuperfruit && Math.random() > 0.5) {
+	        (0, _index.addParagraphToDialog)('You picked up a superfruit... use it wisely');
+	        (0, _index.addFruit)();
+	      }
+	      document.getElementById('road').innerHTML = this.path;
+	    }
+	  }]);
+
+	  return Location;
+	}();
+
+	exports.default = Location;
 
 /***/ })
 /******/ ])));
